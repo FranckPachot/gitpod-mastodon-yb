@@ -1,0 +1,41 @@
+image: gitpod/workspace-postgres
+tasks:
+  - before: |
+      mkdir -p /workspace/.rvm
+      brew install libidn protobuf redis
+      export LD_LIBRARY_PATH="$(brew --prefix protobuf)/lib:$LD_LIBRARY_PATH"
+      export PKG_CONFIG_PATH="$(brew --prefix protobuf)/lib/pkgconfig:$PKG_CONFIG_PATH"
+      redis-server --daemonize yes
+    init: |
+      git clone -b main https://github.com/mastodon/mastodon.git
+      echo $RUBY_VERSION | cut -d- -f2 > mastodon/.ruby-version
+      cd mastodon
+      git checkout main
+      bundle config --local build.idn-ruby --with-idn-dir=$(brew --prefix libidn)
+      bundle install
+      yarn install
+      echo "LOCAL_DOMAIN=$(gp url 8080 | cut -d/ -f3)" > .env.production
+      cat ../.env.production.example >> .env.production
+      echo "SMTP_FROM_ADDRESS='Mastodon <notifications@$(gp url 8080 | cut -d/ -f3)>" >> .env.production
+      echo "SECRET_KEY_BASE=$(RAILS_ENV=production bundle exec rake secret)" >> .env.production
+      echo "OTP_SECRET=$(RAILS_ENV=production bundle exec rake secret)" >> .env.production
+      RAILS_ENV=production bundle exec rake mastodon:webpush:generate_vapid_key >> .env.production
+      RAILS_ENV=production rails db:setup
+      RAILS_ENV=production rails assets:precompile
+      RAILS_ENV=production bin/tootctl accounts create a --email admin@$(gp url 8080 | cut -d/ -f3) --confirmed --role admin
+      cd ..
+    command: |
+      cd mastodon
+      BIND=0.0.0.0 PORT=8008 node ./streaming &
+      RAILS_ENV=production DB_POOL=5 bundle exec sidekiq -c 5 &
+      RAILS_ENV=production BIND=0.0.0.0 PORT=8080 RAILS_SERVE_STATIC_FILES=true bundle exec puma -C config/puma.rb
+ports:
+  - port: 8080
+    visibility: public
+    onOpen: open-preview
+  - port: 8008
+    onOpen: ignore
+  - port: 5432
+    onOpen: ignore
+  - port: 6379
+    onOpen: ignore
