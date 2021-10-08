@@ -1,2 +1,2 @@
 mastodon/
-dump.rdb
+*.rdb
