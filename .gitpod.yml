@@ -25,14 +25,17 @@ tasks:
       RAILS_ENV=production rails assets:precompile
       RAILS_ENV=production bin/tootctl accounts create a --email admin@$(gp url 8080 | cut -d/ -f3) --confirmed --role admin
       cd ..
+      gp sync-done init
     command: |
       cd mastodon
       RAILS_ENV=production BIND=0.0.0.0 PORT=8080 RAILS_SERVE_STATIC_FILES=true bundle exec puma -C config/puma.rb
   - name: sidekiq
+    init: gp sync-await init
     command: |
       cd mastodon
       RAILS_ENV=production DB_POOL=5 bundle exec sidekiq -c 5
   - name: streaming
+    init: gp sync-await init
     command: |
       cd mastodon
       BIND=0.0.0.0 PORT=8008 node ./streaming
