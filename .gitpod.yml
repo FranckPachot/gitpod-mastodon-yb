@@ -1,6 +1,7 @@
 image: gitpod/workspace-postgres
 tasks:
-  - before: |
+  - name: web
+    before: |
       mkdir -p /workspace/.rvm
       brew install libidn protobuf redis
       export LD_LIBRARY_PATH="$(brew --prefix protobuf)/lib:$LD_LIBRARY_PATH"
@@ -26,9 +27,15 @@ tasks:
       cd ..
     command: |
       cd mastodon
-      BIND=0.0.0.0 PORT=8008 node ./streaming &
-      RAILS_ENV=production DB_POOL=5 bundle exec sidekiq -c 5 &
       RAILS_ENV=production BIND=0.0.0.0 PORT=8080 RAILS_SERVE_STATIC_FILES=true bundle exec puma -C config/puma.rb
+  - name: sidekiq
+    command: |
+      cd mastodon
+      RAILS_ENV=production DB_POOL=5 bundle exec sidekiq -c 5
+  - name: streaming
+    command: |
+      cd mastodon
+      BIND=0.0.0.0 PORT=8008 node ./streaming
 ports:
   - port: 8080
     visibility: public
