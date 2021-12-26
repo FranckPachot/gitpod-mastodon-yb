@@ -1,14 +1,13 @@
 {
     "sqltools.connections": [
         {
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 5432,
-            "driver": "PostgreSQL",
             "name": "PGSQL",
+            "driver": "PostgreSQL",
+            "server": "127.0.0.1",
+            "port": 5432,
             "database": "postgres",
             "username": "gitpod",
-            "password": ""
+            "password": null
         }
     ]
 }
