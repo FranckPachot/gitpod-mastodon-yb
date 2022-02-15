@@ -4,14 +4,15 @@ tasks:
     before: |
       mkdir -p /workspace/.rvm
       brew install libidn protobuf redis
+      if [ -z $GITTAG ]; then export GITTAG=main; fi
       export LD_LIBRARY_PATH="$(brew --prefix protobuf)/lib:$LD_LIBRARY_PATH"
       export PKG_CONFIG_PATH="$(brew --prefix protobuf)/lib/pkgconfig:$PKG_CONFIG_PATH"
       gp sync-done before
     init: |
-      git clone -b main https://github.com/mastodon/mastodon.git
+      git clone -b $GITTAG https://github.com/mastodon/mastodon.git
       echo $RUBY_VERSION | cut -d- -f2 > mastodon/.ruby-version
       cd mastodon
-      git checkout main
+      git checkout $GITTAG
       bundle config --local build.idn-ruby --with-idn-dir=$(brew --prefix libidn)
       bundle install
       yarn install
