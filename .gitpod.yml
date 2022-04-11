@@ -4,27 +4,27 @@ tasks:
     before: |
       mkdir -p /workspace/.rvm
       brew install libidn protobuf redis
-      if [ -z $GITTAG ]; then export GITTAG=main; fi
+      if [ -z "$GITTAG" ]; then export GITTAG=main; fi
       export LD_LIBRARY_PATH="$(brew --prefix protobuf)/lib:$LD_LIBRARY_PATH"
       export PKG_CONFIG_PATH="$(brew --prefix protobuf)/lib/pkgconfig:$PKG_CONFIG_PATH"
       gp sync-done before
     init: |
-      git clone -b $GITTAG https://github.com/mastodon/mastodon.git
-      echo $RUBY_VERSION | cut -d- -f2 > mastodon/.ruby-version
+      git clone -b "$GITTAG" https://github.com/mastodon/mastodon.git
+      echo "$RUBY_VERSION" | cut -d- -f2 > mastodon/.ruby-version
       cd mastodon
-      git checkout $GITTAG
-      bundle config --local build.idn-ruby --with-idn-dir=$(brew --prefix libidn)
+      git checkout "$GITTAG"
+      bundle config --local build.idn-ruby --with-idn-dir="$(brew --prefix libidn)"
       bundle install
       yarn install
       echo "LOCAL_DOMAIN=$(gp url 8080 | cut -d/ -f3)" > .env.production
       cat ../.env.production.example >> .env.production
-      echo "SMTP_FROM_ADDRESS='Mastodon <notifications@$(gp url 8080 | cut -d/ -f3)>" >> .env.production
+      echo "SMTP_FROM_ADDRESS=notifications@$(gp url 8080 | cut -d/ -f3)" >> .env.production
       echo "SECRET_KEY_BASE=$(RAILS_ENV=production bundle exec rake secret)" >> .env.production
       echo "OTP_SECRET=$(RAILS_ENV=production bundle exec rake secret)" >> .env.production
       RAILS_ENV=production bundle exec rake mastodon:webpush:generate_vapid_key >> .env.production
       RAILS_ENV=production rails db:setup
       RAILS_ENV=production rails assets:precompile
-      RAILS_ENV=production bin/tootctl accounts create a --email admin@$(gp url 8080 | cut -d/ -f3) --confirmed --role admin
+      RAILS_ENV=production bin/tootctl accounts create a --email admin@"$(gp url 8080 | cut -d/ -f3)" --confirmed --role admin
       cd ..
       gp sync-done init
     command: |
