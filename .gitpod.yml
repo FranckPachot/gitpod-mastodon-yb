@@ -24,7 +24,7 @@ tasks:
       RAILS_ENV=production bundle exec rake mastodon:webpush:generate_vapid_key >> .env.production
       RAILS_ENV=production rails db:setup
       RAILS_ENV=production rails assets:precompile
-      RAILS_ENV=production bin/tootctl accounts create a --email admin@"$(gp url 8080 | cut -d/ -f3)" --confirmed --role admin
+      RAILS_ENV=production bin/tootctl accounts create a --email "admin@$(gp url 8080 | cut -d/ -f3)" --confirmed --role admin
       cd ..
       gp sync-done init
     command: |
@@ -33,8 +33,6 @@ tasks:
   - name: sidekiq
     before: |
       gp sync-await before
-      export LD_LIBRARY_PATH="$(brew --prefix protobuf)/lib:$LD_LIBRARY_PATH"
-      export PKG_CONFIG_PATH="$(brew --prefix protobuf)/lib/pkgconfig:$PKG_CONFIG_PATH"
       redis-server --daemonize yes
     init: gp sync-await init
     command: |
