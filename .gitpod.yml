@@ -17,8 +17,8 @@ tasks:
   - name: web
     before: |
       mkdir -p /workspace/.rvm
-      rvm install 3.1.0
-      rvm use 3.1.0
+      rvm install 3.0.4
+      rvm use 3.0.4
       brew install libidn protobuf redis
       if [ -z "$GITTAG" ]; then export GITTAG=main; fi
       export LD_LIBRARY_PATH="$(brew --prefix protobuf)/lib:$LD_LIBRARY_PATH"
