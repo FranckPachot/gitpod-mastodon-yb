@@ -1,8 +1,24 @@
 image: gitpod/workspace-postgres
 tasks:
+  - name: streaming
+    before: gp sync-await before
+    init: gp sync-await init
+    command: |
+      cd mastodon
+      BIND=0.0.0.0 PORT=8008 node ./streaming
+  - name: sidekiq
+    before: |
+      gp sync-await before
+      redis-server --daemonize yes
+    init: gp sync-await init
+    command: |
+      cd mastodon
+      RAILS_ENV=production DB_POOL=5 bundle exec sidekiq -c 5
   - name: web
     before: |
       mkdir -p /workspace/.rvm
+      rvm install 3.1.0
+      rvm use 3.1.0
       brew install libidn protobuf redis
       if [ -z "$GITTAG" ]; then export GITTAG=main; fi
       export LD_LIBRARY_PATH="$(brew --prefix protobuf)/lib:$LD_LIBRARY_PATH"
@@ -30,20 +46,6 @@ tasks:
     command: |
       cd mastodon
       RAILS_ENV=production BIND=0.0.0.0 PORT=8080 RAILS_SERVE_STATIC_FILES=true bundle exec puma -C config/puma.rb
-  - name: sidekiq
-    before: |
-      gp sync-await before
-      redis-server --daemonize yes
-    init: gp sync-await init
-    command: |
-      cd mastodon
-      RAILS_ENV=production DB_POOL=5 bundle exec sidekiq -c 5
-  - name: streaming
-    before: gp sync-await before
-    init: gp sync-await init
-    command: |
-      cd mastodon
-      BIND=0.0.0.0 PORT=8008 node ./streaming
 ports:
   - port: 8080
     visibility: public

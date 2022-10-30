@@ -1,7 +1,7 @@
 # Gitpod Mastodon
 https://gitlab.com/acefed/gitpod-mastodon/-/tree/main
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#GITTAG=main/https://gitlab.com/acefed/gitpod-mastodon)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#GITTAG=v3.4.8/https://gitlab.com/acefed/gitpod-mastodon)
 
 https://gitlab.com/acefed/gitpod-mastodon/-/tree/fedibird
 
