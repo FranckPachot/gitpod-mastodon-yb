@@ -17,12 +17,8 @@ tasks:
   - name: web
     before: |
       mkdir -p /workspace/.rvm
-      rvm install 2.7.6
-      rvm use 2.7.6
-      brew install libidn protobuf redis
+      brew install libidn redis
       if [ -z "$GITTAG" ]; then export GITTAG=main; fi
-      export LD_LIBRARY_PATH="$(brew --prefix protobuf)/lib:$LD_LIBRARY_PATH"
-      export PKG_CONFIG_PATH="$(brew --prefix protobuf)/lib/pkgconfig:$PKG_CONFIG_PATH"
       gp sync-done before
     init: |
       git clone -b "$GITTAG" https://github.com/mastodon/mastodon.git
