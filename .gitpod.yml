@@ -46,13 +46,13 @@ tasks:
       # create the database
       RAILS_ENV=production rails --trace db:setup
       # add indexes with DDL (this may be done from schema.rb)
-      ysqlsh -e -c '
+      ysqlsh -e -c "
        create or replace function array_signature(a bigint[])
-       returns text as $$
+       returns text as '
        select array_agg(unnest order by unnest)::text
        from unnest(a);
-       $$ immutable language sql;
-      ' -c '
+       ' immutable language sql;
+      " -c '
        CREATE UNIQUE INDEX index_unique_conversations ON public.account_conversations 
        (account_id, conversation_id, (array_signature(participant_account_ids)));
        ' mastodon
