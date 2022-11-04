@@ -1,10 +1,10 @@
-# Gitpod Mastodon
-https://gitlab.com/acefed/gitpod-mastodon/-/tree/main
+# Gitpod to test Mastodon on YugabyteDB
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#GITTAG=v3.5.3/https://gitlab.com/acefed/gitpod-mastodon)
+This is a fork of https://gitlab.com/acefed/gitpod-mastodon/-/tree/main with a few changes to run on YugabyteDB instead of PostgreSQL.
+The changes are detailed in the following blog post: https://dev.to/yugabyte/mastodon-on-yugabytedb-10o2
 
-https://gitlab.com/acefed/gitpod-mastodon/-/tree/fedibird
+You can test it on Gitpod:
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#GITTAG=fedibird/https://gitlab.com/acefed/gitpod-mastodon/-/tree/fedibird)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#GITTAG=v3.5.3/https://github.com/FranckPachot/gitpod-mastodon-yb)
 
-https://acefed.gitlab.io/gitpod-mastodon
+Five admin users are created, the password is in the logs. You cannot create users from the GUI because there's no SMTP server. The GUI is exposed on port 8080
