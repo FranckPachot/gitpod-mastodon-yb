@@ -36,9 +36,33 @@ tasks:
       echo "SECRET_KEY_BASE=$(RAILS_ENV=production bundle exec rake secret)" >> .env.production
       echo "OTP_SECRET=$(RAILS_ENV=production bundle exec rake secret)" >> .env.production
       RAILS_ENV=production bundle exec rake mastodon:webpush:generate_vapid_key >> .env.production
-      RAILS_ENV=production rails db:setup
+      # wait until YSQL is available, create the database and utility function
+      until ysqlsh <<<'
+       create database mastodon;\c mastodon
+       create or replace function array_signature(a bigint[])
+       returns text as $$
+       select array_agg(unnest order by unnest)::text
+       from unnest(a);
+       $$ immutable language sql;
+       ' ; do sleep 1 ; done 2>/dev/null
+      # remove indexes that are not supported
+      sed -e '/"index_unique_conversations"/d' -i db/schema.rb
+      sed -e '/"index_ip_blocks_on_ip"/d' -i db/schema.rb
+      # create the database
+      RAILS_ENV=production rails --trace db:setup
+      # add indexes with DDL (this may be done from schema.rb)
+      ysqlsh -e -c '
+       CREATE UNIQUE INDEX index_unique_conversations ON public.account_conversations 
+       (account_id, conversation_id, (array_signature(participant_account_ids)));
+       ' mastodon
+      # end modifications for YugabyteDB
       RAILS_ENV=production rails assets:precompile
       RAILS_ENV=production bin/tootctl accounts create a --email "admin@$(gp url 8080 | cut -d/ -f3)" --confirmed --role admin
+      # create five users to play with conversations
+      for i in {1..5} ; do 
+       email="admin$i@$(gp url 8080 | cut -d/ -f3)" 
+       echo Password for "$email" is: $(RAILS_ENV=production bin/tootctl accounts create admin$i --email "$email" --confirmed --role Admin )
+       done
       cd ..
       gp sync-done init
     command: |
@@ -50,7 +74,19 @@ ports:
     onOpen: open-preview
   - port: 8008
     onOpen: ignore
-  - port: 5432
+  - port: 5433
+    onOpen: ignore
+  - port: 7000
+    onOpen: ignore
+  - port: 7100
+    onOpen: ignore
+  - port: 9000
+    onOpen: ignore
+  - port: 9100
+    onOpen: ignore
+  - port: 12000
+    onOpen: ignore
+  - port: 13000
     onOpen: ignore
   - port: 6379
     onOpen: ignore
