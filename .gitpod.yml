@@ -58,11 +58,11 @@ tasks:
        ' mastodon
       # end modifications for YugabyteDB
       RAILS_ENV=production rails assets:precompile
-      RAILS_ENV=production bin/tootctl accounts create a --email "admin@$(gp url 8080 | cut -d/ -f3)" --confirmed --role Admin
+      RAILS_ENV=production bin/tootctl accounts create a --email "admin@$(gp url 8080 | cut -d/ -f3)" --confirmed --role admin
       # create five users to play with conversations
       for i in {1..5} ; do 
        email="admin$i@$(gp url 8080 | cut -d/ -f3)" 
-       echo Password for "$email" is: $(RAILS_ENV=production bin/tootctl accounts create admin$i --email "$email" --confirmed --role Admin )
+       echo Password for "$email" is: $(RAILS_ENV=production bin/tootctl accounts create admin$i --email "$email" --confirmed --role admin )
        done
       cd ..
       gp sync-done init
