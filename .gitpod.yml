@@ -58,7 +58,7 @@ tasks:
        ' mastodon
       # end modifications for YugabyteDB
       RAILS_ENV=production rails assets:precompile
-      RAILS_ENV=production bin/tootctl accounts create a --email "admin@$(gp url 8080 | cut -d/ -f3)" --confirmed --role admin
+      RAILS_ENV=production bin/tootctl accounts create a --email "admin@$(gp url 8080 | cut -d/ -f3)" --confirmed --role Admin
       # create five users to play with conversations
       for i in {1..5} ; do 
        email="admin$i@$(gp url 8080 | cut -d/ -f3)" 
