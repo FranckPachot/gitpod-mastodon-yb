@@ -39,11 +39,6 @@ tasks:
       # wait until YSQL is available, create the database and utility function
       until ysqlsh <<<'
        create database mastodon;\c mastodon
-       create or replace function array_signature(a bigint[])
-       returns text as $$
-       select array_agg(unnest order by unnest)::text
-       from unnest(a);
-       $$ immutable language sql;
        ' ; do sleep 1 ; done 2>/dev/null
       # remove indexes that are not supported
       sed -e '/"index_unique_conversations"/d' -i db/schema.rb
@@ -52,6 +47,12 @@ tasks:
       RAILS_ENV=production rails --trace db:setup
       # add indexes with DDL (this may be done from schema.rb)
       ysqlsh -e -c '
+       create or replace function array_signature(a bigint[])
+       returns text as $$
+       select array_agg(unnest order by unnest)::text
+       from unnest(a);
+       $$ immutable language sql;
+      ' -c '
        CREATE UNIQUE INDEX index_unique_conversations ON public.account_conversations 
        (account_id, conversation_id, (array_signature(participant_account_ids)));
        ' mastodon
@@ -87,6 +88,8 @@ ports:
   - port: 12000
     onOpen: ignore
   - port: 13000
+    onOpen: ignore
+  - port: 9042
     onOpen: ignore
   - port: 6379
     onOpen: ignore
