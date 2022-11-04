@@ -1,7 +1,6 @@
 # Gitpod to test Mastodon on YugabyteDB
 
-This is a fork of https://gitlab.com/acefed/gitpod-mastodon/-/tree/main with a few changes to run on YugabyteDB instead of PostgreSQL.
-The changes are detailed in the following blog post: https://dev.to/yugabyte/mastodon-on-yugabytedb-10o2
+This is a fork of https://gitlab.com/acefed/gitpod-mastodon/-/tree/main with a few changes to run on YugabyteDB instead of PostgreSQL, for elasticity and high availability. The changes are detailed in the following blog post: https://dev.to/yugabyte/mastodon-on-yugabytedb-10o2
 
 You can test it on Gitpod:
 
