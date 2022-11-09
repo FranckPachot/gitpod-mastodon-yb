@@ -65,6 +65,8 @@ tasks:
        echo Password for "$email" is: $(RAILS_ENV=production bin/tootctl accounts create admin$i --email "$email" --confirmed --role admin )
        done
       cd ..
+      # export the database to check the DDL
+      mkdir -p db ; /usr/local/yugabyte/postgres/bin/ysql_dump mastodon > db/mastodon.sql
       gp sync-done init
     command: |
       cd mastodon
